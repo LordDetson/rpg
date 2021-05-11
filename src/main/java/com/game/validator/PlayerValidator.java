@@ -16,16 +16,16 @@ public class PlayerValidator implements Validator<Player> {
     @Override
     public List<String> validate(Player player) {
         List<String> errors = new ArrayList<>();
-        if (!validateName(player.getName())) {
+        if (player.getName() != null && !validateName(player.getName())) {
             errors.add("name can't be empty and less 12 characters");
         }
-        if (!validateTitle(player.getTitle())) {
+        if (player.getTitle() != null && !validateTitle(player.getTitle())) {
             errors.add("title can't be empty and less 30 characters");
         }
-        if (!validateExperience(player.getExperience())) {
+        if (player.getExperience() != null && !validateExperience(player.getExperience())) {
             errors.add("experience should be more than 0 and less 10000000");
         }
-        if (!validateBirthday(player.getBirthday())) {
+        if (player.getBirthday() != null &&!validateBirthday(player.getBirthday())) {
             errors.add("birthday should be more than 2000 and less 3000");
         }
         return errors;

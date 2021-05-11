@@ -7,7 +7,7 @@ public interface EntityCrudService<ENTITY, ID> {
 
     ENTITY create(ENTITY entity);
 
-    ENTITY update(ENTITY entity);
+    Optional<ENTITY> update(ENTITY entity);
 
     void delete(ID id);
 

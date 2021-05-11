@@ -49,4 +49,20 @@ public class PlayerController {
         playerService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<Player> update(
+            @PathVariable Long id,
+            @RequestBody Player player) {
+        if (id == 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if (!playerService.existsById(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        playerValidator.throwIfNotValid(player);
+        player.setId(id);
+        Optional<Player> updatedPlayer = playerService.update(player);
+        return ResponseEntity.of(updatedPlayer);
+    }
 }

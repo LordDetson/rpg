@@ -1,5 +1,6 @@
 package com.game.service;
 
+import com.game.entity.Field;
 import com.game.entity.Player;
 import com.game.repository.PlayerRepository;
 import com.game.util.Calculator;
@@ -23,8 +24,23 @@ public class PlayerService implements EntityCrudService<Player, Long> {
     }
 
     @Override
-    public Player update(Player player) {
-        return playerRepository.save(player);
+    public Optional<Player> update(Player player) {
+        Optional<Player> playerOptional = findById(player.getId());
+        if (playerOptional.isPresent()) {
+            Player playerById = playerOptional.get();
+            for (Field<Player> field : Player.PlayerField.values()) {
+                Object value = field.getValue(player);
+                Object valueFromDb = field.getValue(playerById);
+                if (value != null && !value.equals(valueFromDb)) {
+                    field.setValue(playerById, value);
+                    if (field == Player.PlayerField.EXPERIENCE) {
+                        calculatePlayer(playerById);
+                    }
+                }
+            }
+            return Optional.of(playerRepository.save(playerById));
+        }
+        return Optional.empty();
     }
 
     @Override
