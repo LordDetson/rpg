@@ -37,4 +37,16 @@ public class PlayerController {
         Optional<Player> player = playerService.findById(id);
         return ResponseEntity.of(player);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Player> delete(@PathVariable Long id) {
+        if (id == 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if (!playerService.existsById(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        playerService.delete(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
