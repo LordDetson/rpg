@@ -2,15 +2,15 @@ package com.game.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.game.entity.Profession;
-import com.game.entity.Race;
 import com.game.controller.utils.PlayerInfoTest;
 import com.game.controller.utils.TestsHelper;
+import com.game.entity.Profession;
+import com.game.entity.Race;
 import org.junit.Test;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
@@ -53,6 +53,20 @@ public class GetAllTest extends AbstractTest {
                         testsHelper.getAllPlayers()));
 
         assertEquals("Возвращается не правильный результат при запросе GET /rest/players с параметрами name и pageNumber.", expected, actual);
+    }
+
+    @Test
+    public void getAllWithFiltersPageAndOrdering() throws Exception {
+        ResultActions resultActions = mockMvc.perform(get("/rest/players?order=name&pageNumber=0&pageSize=40"))
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+        List<PlayerInfoTest> actual = mapper.readValue(contentAsString, typeReference);
+        List<PlayerInfoTest> expected = testsHelper.getPlayerInfosByPage(0, 40, testsHelper.getAllPlayers());
+        expected.sort(Comparator.comparing(o -> o.name));
+
+        assertEquals("Возвращается не правильный результат при запросе GET /rest/players с параметрами order, pageNumber, pageSize.", expected, actual);
     }
 
     //test3

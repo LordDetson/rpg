@@ -3,14 +3,23 @@ package com.game.service;
 import com.game.entity.Field;
 import com.game.entity.Player;
 import com.game.repository.PlayerRepository;
+import com.game.service.criteria.PageCriteria;
+import com.game.service.criteria.PlayerCriteria;
 import com.game.util.Calculator;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+import static com.game.repository.PrimitiveSpecifications.*;
+
 @Service
-public class PlayerService implements EntityCrudService<Player, Long> {
+public class PlayerService implements EntityCrudService<Player, Long>, SearchService<PlayerCriteria, Player> {
 
     private final PlayerRepository playerRepository;
 
@@ -74,5 +83,35 @@ public class PlayerService implements EntityCrudService<Player, Long> {
         int untilNextLevel = Calculator.calculateUntilNextLevel(level, experience);
         player.setLevel(level);
         player.setUntilNextLevel(untilNextLevel);
+    }
+
+    @Override
+    public Specification<Player> buildSpecification(PlayerCriteria criteria) {
+        return Specification
+                .where(like(Player.PlayerField.NAME, criteria.getName()))
+                .and(like(Player.PlayerField.TITLE, criteria.getTitle()))
+                .and(between(Player.PlayerField.BIRTHDAY, criteria.getStartDate(), criteria.getFinishDate()))
+                .and(greaterThan(Player.PlayerField.BIRTHDAY, criteria.getStartDate()))
+                .and(lessThan(Player.PlayerField.BIRTHDAY, criteria.getFinishDate()))
+                .and(between(Player.PlayerField.EXPERIENCE, criteria.getMinExperience(), criteria.getMaxExperience()))
+                .and(greaterThan(Player.PlayerField.EXPERIENCE, criteria.getMinExperience()))
+                .and(lessThan(Player.PlayerField.EXPERIENCE, criteria.getMaxExperience()))
+                .and(between(Player.PlayerField.LEVEL, criteria.getMinLevel(), criteria.getMaxLevel()))
+                .and(greaterThan(Player.PlayerField.LEVEL, criteria.getMinLevel()))
+                .and(lessThan(Player.PlayerField.LEVEL, criteria.getMaxLevel()))
+                .and(equal(Player.PlayerField.BANNED, criteria.getBanned()))
+                .and(equal(Player.PlayerField.RACE, criteria.getRace()))
+                .and(equal(Player.PlayerField.PROFESSION, criteria.getProfession()));
+    }
+
+    @Override
+    public Pageable buildPageable(PageCriteria pageCriteria) {
+        Sort sort = Sort.by(pageCriteria.getOrder());
+        return PageRequest.of(pageCriteria.getPageNumber(), pageCriteria.getPageSize(), sort);
+    }
+
+    @Override
+    public JpaSpecificationExecutor<Player> getSpecificationExecutor() {
+        return playerRepository;
     }
 }

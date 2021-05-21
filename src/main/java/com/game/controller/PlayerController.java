@@ -2,11 +2,14 @@ package com.game.controller;
 
 import com.game.entity.Player;
 import com.game.service.PlayerService;
+import com.game.service.criteria.PageCriteria;
+import com.game.service.criteria.PlayerCriteria;
 import com.game.validator.PlayerValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -64,5 +67,16 @@ public class PlayerController {
         player.setId(id);
         Optional<Player> updatedPlayer = playerService.update(player);
         return ResponseEntity.of(updatedPlayer);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Player>> search(PlayerCriteria criteria, PageCriteria pageCriteria) {
+        List<Player> resultList = playerService.search(criteria, pageCriteria).getContent();
+        return ResponseEntity.ok(resultList);
+    }
+
+    @GetMapping("/count")
+    public long search(PlayerCriteria criteria) {
+        return playerService.count(criteria);
     }
 }
