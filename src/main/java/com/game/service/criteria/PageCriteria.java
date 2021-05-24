@@ -1,38 +1,35 @@
 package com.game.service.criteria;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Getter
+@Setter
 public class PageCriteria {
 
-    private String order;
-    private Integer pageNumber;
-    private Integer pageSize;
+    String order;
+    Integer pageNumber;
+    Integer pageSize;
 
-    public PageCriteria() {
-        order = "id";
-        pageNumber = 0;
-        pageSize = 3;
-    }
-
-    public String getOrder() {
-        return order;
-    }
-
-    public void setOrder(String order) {
+    public PageCriteria(String order, Integer pageNumber, Integer pageSize) {
         this.order = order;
-    }
-
-    public Integer getPageNumber() {
-        return pageNumber;
-    }
-
-    public void setPageNumber(Integer pageNumber) {
         this.pageNumber = pageNumber;
-    }
-
-    public Integer getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+        initializeDefaultValues();
+    }
+
+    private void initializeDefaultValues() {
+        if (order == null) {
+            order = "id";
+        }
+        if (pageNumber == null) {
+            pageNumber = 0;
+        }
+        if (pageSize == null) {
+            pageSize = 3;
+        }
     }
 }

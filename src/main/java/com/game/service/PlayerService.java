@@ -6,6 +6,9 @@ import com.game.repository.PlayerRepository;
 import com.game.service.criteria.PageCriteria;
 import com.game.service.criteria.PlayerCriteria;
 import com.game.util.Calculator;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,17 +21,16 @@ import java.util.Optional;
 
 import static com.game.repository.PrimitiveSpecifications.*;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 @Service
 public class PlayerService implements EntityCrudService<Player, Long>, SearchService<PlayerCriteria, Player> {
 
-    private final PlayerRepository playerRepository;
-
-    public PlayerService(PlayerRepository playerRepository) {
-        this.playerRepository = playerRepository;
-    }
+    PlayerRepository playerRepository;
 
     @Override
     public Player create(Player player) {
+        calculatePlayer(player);
         return playerRepository.save(player);
     }
 
