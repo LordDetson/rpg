@@ -2,61 +2,50 @@ package com.game.service.criteria;
 
 import com.game.entity.Profession;
 import com.game.entity.Race;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@Getter
+@Setter
 public class PlayerCriteria {
 
-    private String name;
-    private String title;
-    private Race race;
-    private Profession profession;
-    private Long after;
-    private Long before;
-    private Boolean banned;
-    private Integer minExperience;
-    private Integer maxExperience;
-    private Integer minLevel;
-    private Integer maxLevel;
+    @Size(min = 2, max = 12, message = "Name length must be between 2 and 12 characters")
+    String name;
 
-    public PlayerCriteria() {
-    }
+    @Size(max = 30, message = "Title must not exceed 30 characters")
+    String title;
 
-    public String getName() {
-        return name;
-    }
+    Race race;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    Profession profession;
 
-    public String getTitle() {
-        return title;
-    }
+    Long after;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    Long before;
 
-    public Race getRace() {
-        return race;
-    }
+    Boolean banned;
 
-    public void setRace(Race race) {
-        this.race = race;
-    }
+    @Range(min = 0, max = 10_000_000, message = "minExperience must be between 0 and 10_000_000")
+    Integer minExperience;
 
-    public Profession getProfession() {
-        return profession;
-    }
+    @Range(min = 0, max = 10_000_000, message = "maxExperience must be between 0 and 10_000_000")
+    Integer maxExperience;
 
-    public void setProfession(Profession profession) {
-        this.profession = profession;
-    }
+    @PositiveOrZero
+    Integer minLevel;
 
-    public Long getAfter() {
-        return after;
-    }
+    @PositiveOrZero
+    Integer maxLevel;
 
     public Date getStartDate() {
         if (after != null) {
@@ -65,62 +54,10 @@ public class PlayerCriteria {
         return null;
     }
 
-    public void setAfter(Long after) {
-        this.after = after;
-    }
-
-    public Long getBefore() {
-        return before;
-    }
-
     public Date getFinishDate() {
         if (before != null) {
             return new Date(before);
         }
         return null;
-    }
-
-    public void setBefore(Long before) {
-        this.before = before;
-    }
-
-    public Boolean getBanned() {
-        return banned;
-    }
-
-    public void setBanned(Boolean banned) {
-        this.banned = banned;
-    }
-
-    public Integer getMinExperience() {
-        return minExperience;
-    }
-
-    public void setMinExperience(Integer minExperience) {
-        this.minExperience = minExperience;
-    }
-
-    public Integer getMaxExperience() {
-        return maxExperience;
-    }
-
-    public void setMaxExperience(Integer maxExperience) {
-        this.maxExperience = maxExperience;
-    }
-
-    public Integer getMinLevel() {
-        return minLevel;
-    }
-
-    public void setMinLevel(Integer minLevel) {
-        this.minLevel = minLevel;
-    }
-
-    public Integer getMaxLevel() {
-        return maxLevel;
-    }
-
-    public void setMaxLevel(Integer maxLevel) {
-        this.maxLevel = maxLevel;
     }
 }

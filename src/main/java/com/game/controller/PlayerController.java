@@ -1,34 +1,34 @@
 package com.game.controller;
 
 import com.game.entity.Player;
+import com.game.entity.dto.DTO;
+import com.game.entity.dto.PlayerCreationDto;
+import com.game.entity.dto.PlayerUpdateDto;
 import com.game.service.PlayerService;
 import com.game.service.criteria.PageCriteria;
 import com.game.service.criteria.PlayerCriteria;
-import com.game.validator.PlayerValidator;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/rest/players")
 public class PlayerController {
 
-    private final PlayerService playerService;
-    private final PlayerValidator playerValidator;
-
-    public PlayerController(PlayerService playerService, PlayerValidator playerValidator) {
-        this.playerService = playerService;
-        this.playerValidator = playerValidator;
-    }
+    PlayerService playerService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public Player create(@RequestBody Player player) {
-        playerValidator.throwIfNotValid(player);
-        playerService.calculatePlayer(player);
+    public Player create(@DTO(PlayerCreationDto.class) Player player) {
         return playerService.create(player);
     }
 
@@ -56,27 +56,26 @@ public class PlayerController {
     @PostMapping("/{id}")
     public ResponseEntity<Player> update(
             @PathVariable Long id,
-            @RequestBody Player player) {
+            @DTO(PlayerUpdateDto.class) Player player) {
         if (id == 0) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if (!playerService.existsById(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        playerValidator.throwIfNotValid(player);
         player.setId(id);
         Optional<Player> updatedPlayer = playerService.update(player);
         return ResponseEntity.of(updatedPlayer);
     }
 
     @GetMapping
-    public ResponseEntity<List<Player>> search(PlayerCriteria criteria, PageCriteria pageCriteria) {
+    public ResponseEntity<List<Player>> search(@Valid PlayerCriteria criteria, @Valid PageCriteria pageCriteria) {
         List<Player> resultList = playerService.search(criteria, pageCriteria).getContent();
         return ResponseEntity.ok(resultList);
     }
 
     @GetMapping("/count")
-    public long search(PlayerCriteria criteria) {
+    public long search(@Valid PlayerCriteria criteria) {
         return playerService.count(criteria);
     }
 }
